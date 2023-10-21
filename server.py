@@ -91,6 +91,9 @@ parser.add_argument("--talkinghead-gpu", action="store_true", help="Run the talk
 parser.add_argument("--coqui-gpu", action="store_true", help="Run the voice models on the GPU (CPU is default)")
 parser.add_argument("--coqui-models", help="Install given Coqui-api TTS model at launch (comma separated list, last one will be loaded at start)")
 
+parser.add_argument("--bert-vits2-gpu", action="store_true", help="Run the Bert-VITS2 TTS module on the GPU (CPU is default)")
+parser.add_argument("--bert-vits2-model", help="Load a custom Bert-VITS2 TTS model")
+
 parser.add_argument("--max-content-length", help="Set the max")
 parser.add_argument("--rvc-save-file", action="store_true", help="Save the last rvc input/output audio file into data/tmp/ folder (for research)")
 
@@ -422,6 +425,19 @@ if "coqui-tts" in modules:
 
     # Handle both coqui-api/users models
     app.add_url_rule("/api/text-to-speech/coqui/generate-tts", view_func=coqui_module.coqui_generate_tts, methods=["POST"])
+
+
+if "bert-vits2-tts" in modules:
+    print("Initializing BERT-VITS2 TTS client")
+    import modules.text_to_speech.bert_vits2.bert_vits2_module as bert_vits2_module
+
+    if not args.bert_vits2_model:
+        raise ValueError("Missing BERT-VITS2 model dir, please provide it with `--bert-vits2-model`")
+    bert_vits2_module.initialize(args.bert_vits2_model, args.bert_vits2_gpu)
+
+    app.add_url_rule("/api/text-to-speech/bert-vits2/get-speakers", view_func=bert_vits2_module.get_speakers, methods=["GET"])
+    app.add_url_rule("/api/text-to-speech/bert-vits2/generate-tts", view_func=bert_vits2_module.generate_tts, methods=["GET"])
+
 
 def require_module(name):
     def wrapper(fn):

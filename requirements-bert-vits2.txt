@@ -1,0 +1,10 @@
+numba
+phonemizer
+scipy
+jieba
+pypinyin
+cn2an
+num2words
+mecab-python3
+unidic-lite
+fugashi

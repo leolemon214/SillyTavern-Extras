@@ -92,7 +92,7 @@ parser.add_argument("--coqui-gpu", action="store_true", help="Run the voice mode
 parser.add_argument("--coqui-models", help="Install given Coqui-api TTS model at launch (comma separated list, last one will be loaded at start)")
 
 parser.add_argument("--bert-vits2-gpu", action="store_true", help="Run the Bert-VITS2 TTS module on the GPU (CPU is default)")
-parser.add_argument("--bert-vits2-model", help="Load a custom Bert-VITS2 TTS model")
+parser.add_argument("--bert-vits2-model", default='data/models/bert-vits2', help="Load a custom Bert-VITS2 TTS model")
 
 parser.add_argument("--max-content-length", help="Set the max")
 parser.add_argument("--rvc-save-file", action="store_true", help="Save the last rvc input/output audio file into data/tmp/ folder (for research)")

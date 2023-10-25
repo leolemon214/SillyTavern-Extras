@@ -7,9 +7,10 @@ Reference:
 import glob
 import json
 import os
+from io import BytesIO
 
 import torch
-from io import BytesIO
+import av
 from flask import request, Response
 from scipy.io import wavfile
 
@@ -118,6 +119,27 @@ def infer(text, speaker, language, sdp_ratio=0.2, noise_scale=0.5, noise_scale_w
     return audio
 
 
+def wav2(i, o, format):
+    inp = av.open(i, "r")
+    out = av.open(o, "w", format=format)
+    if format == "ogg":
+        format = "libvorbis"
+    if format == "opus":
+        format = "libopus"
+
+    ostream = out.add_stream(format)
+
+    for frame in inp.decode(audio=0):
+        for p in ostream.encode(frame):
+            out.mux(p)
+
+    for p in ostream.encode(None):
+        out.mux(p)
+
+    out.close()
+    inp.close()
+
+
 def generate_tts():
     print(DEBUG_PREFIX, "Received TTS request for ", request.args)
 
@@ -142,7 +164,11 @@ def generate_tts():
     with BytesIO() as wav:
         wavfile.write(wav, hps.data.sampling_rate, audio)
         torch.cuda.empty_cache()
-        return Response(wav.getvalue(), mimetype='audio/wav')
+        wav.seek(0, 0)
+        with BytesIO() as ogg:
+            wav2(wav, ogg, "opus")
+            ogg.seek(0, 0)
+            return Response(ogg.getvalue(), mimetype='audio/webm')
 
 
 def get_speakers():

@@ -8,3 +8,4 @@ num2words
 mecab-python3
 unidic-lite
 fugashi
+av

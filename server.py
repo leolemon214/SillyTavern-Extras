@@ -433,6 +433,9 @@ if "bert-vits2-tts" in modules:
 
     if not args.bert_vits2_model:
         raise ValueError("Missing BERT-VITS2 model dir, please provide it with `--bert-vits2-model`")
+
+    if not args.cpu:
+        args.bert_vits2_gpu = True
     bert_vits2_module.initialize(args.bert_vits2_model, args.bert_vits2_gpu)
 
     app.add_url_rule("/api/text-to-speech/bert-vits2/get-speakers", view_func=bert_vits2_module.get_speakers, methods=["GET"])
